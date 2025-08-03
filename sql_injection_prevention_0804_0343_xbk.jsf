@@ -1,0 +1,54 @@
+// 代码生成时间: 2025-08-04 03:43:38
+package com.example.security;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Managed bean to demonstrate prevention of SQL injection using JSF and JPA.
+ */
+@ManagedBean
+@RequestScoped
+public class SqlInjectionPreventionBean {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    /**
+     * Retrieves a list of users from the database using a parameterized query to prevent SQL injection.
+     *
+     * @param userInput User input that will be used in the query.
+     * @return A list of users that match the input criteria.
+     */
+    public List<User> searchUsers(String userInput) {
+        try {
+            // Use a named query or create a parameterized query to prevent SQL injection.
+            String jpql = "SELECT u FROM User u WHERE u.name LIKE :name";
+            Query query = entityManager.createQuery(jpql, User.class);
+            query.setParameter("name", "%" + userInput + "%");
+            return query.getResultList();
+        } catch (Exception e) {
+            // Log the exception and handle it appropriately.
+            // For simplicity, just print the stack trace here.
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Inner class representing a user entity.
+     * This would typically be in a separate file in a real application.
+     */
+    public static class User {
+        private String id;
+        private String name;
+
+        // Constructors, getters, and setters are omitted for brevity.
+    }
+}
