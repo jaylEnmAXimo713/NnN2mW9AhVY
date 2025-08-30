@@ -1,0 +1,102 @@
+// 代码生成时间: 2025-08-30 09:28:10
+package com.example.configmanager;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+/**
+ * ConfigManager is a managed bean used to manage configuration files.
+ */
+@ManagedBean
+@RequestScoped
+public class ConfigManager {
+
+    private String configPath;
+    private String configFileContent;
+    private boolean configChanged;
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
+    }
+
+    public String getConfigFileContent() {
+        return configFileContent;
+    }
+
+    public void setConfigFileContent(String configFileContent) {
+        this.configFileContent = configFileContent;
+    }
+
+    public boolean isConfigChanged() {
+        return configChanged;
+    }
+
+    public void setConfigChanged(boolean configChanged) {
+        this.configChanged = configChanged;
+    }
+
+    /**
+     * Loads the configuration file content into the configFileContent variable.
+     *
+     * @return The loaded content or an error message.
+     */
+    public String loadConfigFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(configPath))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append('
+');
+            }
+            configFileContent = stringBuilder.toString();
+            return "Configuration file loaded successfully.";
+        } catch (IOException e) {
+            return "Error loading configuration file: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Saves the current configFileContent to the configuration file.
+     *
+     * @return A success message or an error message.
+     */
+    public String saveConfigFile() {
+        try (FileWriter writer = new FileWriter(configPath)) {
+            writer.write(configFileContent);
+            writer.flush();
+            configChanged = false;
+            return "Configuration file saved successfully.";
+        } catch (IOException e) {
+            return "Error saving configuration file: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Checks if the configuration file has been modified.
+     *
+     * @return true if the file has changed, false otherwise.
+     */
+    public boolean checkConfigChanged() {
+        try {
+            List<String> originalContent = Files.readAllLines(Paths.get(configPath));
+            List<String> currentContent = List.of(configFileContent.split('
+'));
+            return !originalContent.equals(currentContent);
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    // Additional methods can be added here for more functionality
+}
